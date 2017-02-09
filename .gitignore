@@ -3,7 +3,6 @@
 
 # Project specific files
 [Aa]ssets/
-[Aa]ssemblyInfo.cs
 *.*manifest
 
 # User-specific files

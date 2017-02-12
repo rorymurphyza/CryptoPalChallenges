@@ -8,5 +8,15 @@ namespace CryptoPalChallenges.Set2
 {
     public partial class Set2
     {
+        private static Random rnd = new Random();
+        private static byte[] ChallengeKey;
+
+        private static void GenerateAESChallengeKey()
+        {
+            byte[] key = new byte[16];
+            for (int i = 0; i < key.Length; i++)
+                key[i] = (byte)rnd.Next(byte.MinValue, byte.MaxValue);
+            ChallengeKey = key;
+        }
     }
 }

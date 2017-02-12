@@ -14,7 +14,7 @@ namespace CryptoPalChallenges.Set3
         {
             rnd = new Random();
             //generate the key
-            ChallengeKey = BlockCipher.generateRandomAESKey();
+            ChallengeKey = BlockCipherdep.generateRandomAESKey();
 
             //Call the oracle and get back the cipherText and IV
             byte[] IV;
@@ -41,9 +41,9 @@ namespace CryptoPalChallenges.Set3
             byte[] plainText = inputCipherText[rnd.Next(0, inputCipherText.Count)];
 
             //Encrypt it under the CBC mode
-            var cipher = new BlockCipher(ChallengeKey);
+            var cipher = new BlockCipherdep(ChallengeKey);
             cipher.plainText = plainText;
-            BlockCipher.CBCMode.encrypt(cipher);
+            BlockCipherdep.CBCMode.encrypt(cipher);
 
             IV = cipher.IV;
             return cipher.cipherText;
@@ -51,10 +51,10 @@ namespace CryptoPalChallenges.Set3
 
         private static byte[] challenge17Decrypter(byte[] cipherText, byte[] IV)
         {
-            var cipher = new BlockCipher(ChallengeKey);
+            var cipher = new BlockCipherdep(ChallengeKey);
             cipher.cipherText = cipherText;
             cipher.IV = IV;
-            BlockCipher.CBCMode.decrypt(cipher);
+            BlockCipherdep.CBCMode.decrypt(cipher);
 
             return cipher.plainText;
         }

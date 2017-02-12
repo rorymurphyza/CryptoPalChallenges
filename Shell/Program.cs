@@ -1,6 +1,7 @@
 ﻿using System;
 using CryptoPalChallenges;
 using CryptoPalChallenges.Set3;
+using Cipher;
 
 namespace Shell
 {
@@ -13,7 +14,8 @@ namespace Shell
             //Encrypter.RepeatingXOR("Burning 'em, if you ain't quick and nimble I go crazy when I hear a cymbal", "ICE");    //Set 1, Challenge 5
             //Workers.BreakRepeatingXOR();    //Set 1, Challenge 6 worker and solution
             //Workers.AESinECBMode();         //Set 1, Challange 7 worker and solution
-            //Workers.DetectECBEncoding();      //Set 1, Challenge 8 worker and solution
+            //Workers.DetectECBEncoding();      //Set 1, Challenge 8 worker and 
+
 
             Console.WriteLine("All done. Press any key to exit.");
             Console.ReadKey();

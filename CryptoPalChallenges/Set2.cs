@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace CryptoPalChallenges
 {
-    class Set2
+    class Set2dep
     {
     }
 
-    public class BlockCipher
+    public class BlockCipherdep
     {
         /// <summary>
         /// Initial values vector
@@ -34,13 +34,13 @@ namespace CryptoPalChallenges
         /// </summary>
         public int blockSize { get; set; }
 
-        public BlockCipher() { }
+        public BlockCipherdep() { }
 
         /// <summary>
         /// Constructor for standard settings and key as the input. Uses a 0x00 IV
         /// </summary>
         /// <param name="key"></param>
-        public BlockCipher(byte[] _key)
+        public BlockCipherdep(byte[] _key)
         {
             //set up IV of all zeroes
             byte[] iv = new byte[16];
@@ -63,7 +63,7 @@ namespace CryptoPalChallenges
             /// </summary>
             /// <param name="cipherText"></param>
             /// <returns></returns>
-            public static void decrypt(BlockCipher cipher)
+            public static void decrypt(BlockCipherdep cipher)
             {
                 byte[] plainText = new byte[cipher.cipherText.Length];
                 //Break the cipher text into blocks
@@ -106,7 +106,7 @@ namespace CryptoPalChallenges
             /// </summary>
             /// <param name="plainText"></param>
             /// <returns></returns>
-            public static void encrypt(BlockCipher cipher)
+            public static void encrypt(BlockCipherdep cipher)
             {
                 byte[] plainText = cipher.plainText;
                 if ((plainText.Length % cipher.blockSize) != 0)
@@ -211,7 +211,7 @@ namespace CryptoPalChallenges
             string plainText = "";
             string key = "YELLOW SUBMARINE";
 
-            BlockCipher cipher = new BlockCipher();            
+            BlockCipherdep cipher = new BlockCipherdep();            
             cipher.key = CryptoPalChallenges.Utils.ConvertStringToByteArray(key);
             cipher.blockSize = cipher.key.Length;            
 
@@ -224,7 +224,7 @@ namespace CryptoPalChallenges
             byte[] encryptedText = Convert.FromBase64String(lines);
             cipher.cipherText = encryptedText;
 
-            BlockCipher.CBCMode.decrypt(cipher);
+            BlockCipherdep.CBCMode.decrypt(cipher);
             plainText = Utils.ConvertByteArrayToString(cipher.plainText);
 
             return plainText;
@@ -311,7 +311,7 @@ namespace CryptoPalChallenges
             byte[] key = generateRandomAESKey();    //The key would actually be part of the oracle, but we are going to use it here just for simplicities sake
 
             //using the ciphertext we get now, we want to escalate the role to admin
-            byte[] cipherText = BlockCipher.ECBMode.encrypt(Utils.ConvertStringToByteArray(cookie), key);
+            byte[] cipherText = BlockCipherdep.ECBMode.encrypt(Utils.ConvertStringToByteArray(cookie), key);
             /*At this point, our cookie looks like this: email=foo@bar.com&uid=10&role=user
             Which is broken up by ECB into 16 bytes packets to be encoded:
             Packet 0:   email=aname@bar.                        
@@ -329,7 +329,7 @@ namespace CryptoPalChallenges
             emailBytes = Utils.ConvertStringToByteArray(sb.ToString());
 
             cookie = createCookieForProfile(sb.ToString());
-            byte[] adminCipherText = BlockCipher.ECBMode.encrypt(Utils.ConvertStringToByteArray(cookie), key);
+            byte[] adminCipherText = BlockCipherdep.ECBMode.encrypt(Utils.ConvertStringToByteArray(cookie), key);
             //Now, the second block of the adminCipherText should contain the "admin" block, with padding of 11 afterwards
 
             //Convert the cipher text into a List so we can work with it easily
@@ -342,7 +342,7 @@ namespace CryptoPalChallenges
             newCipherList.Add(adminCipherList[1]);     //The injected part that should contain the "admin...." part to get us the new role
 
             byte[] newCipherText = Utils.ConvertListToByteArray(newCipherList);
-            byte[] decryptedCookieText = BlockCipher.ECBMode.decrypt(newCipherText, key);
+            byte[] decryptedCookieText = BlockCipherdep.ECBMode.decrypt(newCipherText, key);
 
             string decrpytedCookie = Utils.ConvertByteArrayToString(decryptedCookieText);
             cookieDictionary = parseStructuredCookie(decrpytedCookie);
@@ -372,7 +372,7 @@ namespace CryptoPalChallenges
 
             //string input = "Ice Ice Baby";
             string input = ";admin=true;;;;;";
-            BlockCipher cipher;
+            BlockCipherdep cipher;
             byte[] cipherText = challenge16Oracle(input, out cipher);
 
             //test first to make sure that this string returns a false
@@ -384,7 +384,7 @@ namespace CryptoPalChallenges
 
         }
 
-        public static byte[] challenge16Oracle(string input, out BlockCipher cipher)
+        public static byte[] challenge16Oracle(string input, out BlockCipherdep cipher)
         {
             string prepend = "comment1=cooking%20MCs;userdata=";
             string append = ";comment2=%20like%20a%20pound%20of%20bacon";
@@ -393,7 +393,7 @@ namespace CryptoPalChallenges
             plainText = plainText.Replace(";", "");
             plainText = plainText.Replace("=", "");
 
-            cipher = new BlockCipher();
+            cipher = new BlockCipherdep();
             cipher.blockSize = 16;
             byte[] iv = new byte[16];
             for (int i = 0; i < iv.Length; i++)
@@ -403,13 +403,13 @@ namespace CryptoPalChallenges
             byte[] plainTextBytes = Utils.ConvertStringToByteArray(plainText);
             cipher.plainText = plainTextBytes;
 
-            BlockCipher.CBCMode.encrypt(cipher);
+            BlockCipherdep.CBCMode.encrypt(cipher);
             return cipher.cipherText;
         }
 
-        public static bool challenge16Decrypter(BlockCipher cipher)
+        public static bool challenge16Decrypter(BlockCipherdep cipher)
         {
-            BlockCipher.CBCMode.decrypt(cipher);
+            BlockCipherdep.CBCMode.decrypt(cipher);
             byte[] plainText = cipher.plainText;
 
             string plain = Utils.ConvertByteArrayToString(plainText);
@@ -498,7 +498,7 @@ namespace CryptoPalChallenges
             originalMessage.CopyTo(plainText, 0);
             toBeAppended.CopyTo(plainText, originalMessage.Length);
 
-            return BlockCipher.ECBMode.encrypt(plainText, ChallengeKey);
+            return BlockCipherdep.ECBMode.encrypt(plainText, ChallengeKey);
         }
 
         /// <summary>
@@ -524,7 +524,7 @@ namespace CryptoPalChallenges
             for (int i = 0; i < output.Length; i++)             //convert the list into a byte[] so it can be encrypted
                 output[i] = plainText[i];
 
-            return BlockCipher.ECBMode.encrypt(output, ChallengeKey);
+            return BlockCipherdep.ECBMode.encrypt(output, ChallengeKey);
         }
 
         /// <summary>
@@ -543,7 +543,7 @@ namespace CryptoPalChallenges
             for (int i = 1; i < (256 / 8); i++)
             {
                 int currentPlainLength = sb.ToString().Length;
-                byte[] cipherText = BlockCipher.ECBMode.encrypt(Utils.ConvertStringToByteArray(sb.ToString()), key);
+                byte[] cipherText = BlockCipherdep.ECBMode.encrypt(Utils.ConvertStringToByteArray(sb.ToString()), key);
                 int currentCipherLength = cipherText.Length;
                 if (!(foundSuspect) && (currentCipherLength > suspectedBlockSize))
                 {
@@ -594,7 +594,7 @@ namespace CryptoPalChallenges
             }
             else
             {
-                BlockCipher cipher = new BlockCipher();
+                BlockCipherdep cipher = new BlockCipherdep();
                 cipher.plainText = inputWithRandom;
                 cipher.key = generateRandomAESKey();
                 cipher.blockSize = cipher.key.Length;

@@ -74,7 +74,7 @@ namespace CryptoPalChallenges
         {
             string input = "ABCDEABCDEABCDEF";
             string key = "YELLOW SUBMARINE";
-            byte[] output = CryptoPalChallenges.BlockCipher.ECBMode.encrypt(Utils.ConvertStringToByteArray(input), Utils.ConvertStringToByteArray(key));
+            byte[] output = BlockCipherdep.ECBMode.encrypt(Utils.ConvertStringToByteArray(input), Utils.ConvertStringToByteArray(key));
             string answer64 = "qtdEJb/T+P8idy91vnRt+A==";
             string answerHex = "aad74425bfd3f8ff22772f75be746df8";
 
@@ -87,7 +87,7 @@ namespace CryptoPalChallenges
         {
             string input64 = "FYtzWIwGx67LrZRSLYdiOg==";
             string key = "YELLOW SUBMARINE";
-            byte[] output = CryptoPalChallenges.BlockCipher.ECBMode.decrypt(Convert.FromBase64String(input64), Utils.ConvertStringToByteArray(key));
+            byte[] output = CryptoPalChallenges.BlockCipherdep.ECBMode.decrypt(Convert.FromBase64String(input64), Utils.ConvertStringToByteArray(key));
             string answer = "ABCDE";
 
             Assert.AreEqual(answer, Utils.ConvertByteArrayToString(output).Trim('\0'));
@@ -99,7 +99,7 @@ namespace CryptoPalChallenges
             string input = "ABCDEABCDEABCDEF";
             string key = "YELLOW SUBMARINE";
 
-            BlockCipher cipher = new BlockCipher();
+            BlockCipherdep cipher = new BlockCipherdep();
             cipher.blockSize = key.Length;
             cipher.key = Utils.ConvertStringToByteArray(key);
             byte[] iv = new byte[key.Length];
@@ -108,7 +108,7 @@ namespace CryptoPalChallenges
             cipher.IV = iv;
             cipher.plainText = Utils.ConvertStringToByteArray(input);
 
-            CryptoPalChallenges.BlockCipher.CBCMode.encrypt(cipher);
+            CryptoPalChallenges.BlockCipherdep.CBCMode.encrypt(cipher);
             byte[] output = cipher.cipherText;
 
             string answer = "aad74425bfd3f8ff22772f75be746df8";
@@ -123,7 +123,7 @@ namespace CryptoPalChallenges
             string input = "qtdEJb/T+P8idy91vnRt+A==";
             string key = "YELLOW SUBMARINE";
 
-            BlockCipher cipher = new BlockCipher();
+            BlockCipherdep cipher = new BlockCipherdep();
             cipher.key = Utils.ConvertStringToByteArray(key);
             cipher.blockSize = key.Length;
             cipher.cipherText = Convert.FromBase64String(input);
@@ -132,7 +132,7 @@ namespace CryptoPalChallenges
                 iv[i] = 0x00;
             cipher.IV = iv;
 
-            CryptoPalChallenges.BlockCipher.CBCMode.decrypt(cipher);
+            CryptoPalChallenges.BlockCipherdep.CBCMode.decrypt(cipher);
             byte[] output = cipher.plainText;
 
             string answer = "ABCDEABCDEABCDEF";

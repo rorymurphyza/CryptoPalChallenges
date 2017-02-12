@@ -56,8 +56,13 @@
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTest2.cs" />
+    <Compile Include="BlockCipherTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cipher\Cipher.csproj">
+      <Project>{9f1fde29-53e5-4b84-8a11-cb8078af6442}</Project>
+      <Name>Cipher</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CryptoPalChallenges\CryptoPalChallenges.csproj">
       <Project>{07229564-c582-4d3a-b07f-767693d1c33e}</Project>
       <Name>CryptoPalChallenges</Name>

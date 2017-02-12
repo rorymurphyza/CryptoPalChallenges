@@ -26,12 +26,7 @@ namespace UnitTests
             string output = Xor.XorEqualLength(input1, input2);
             string answer = "746865206b696420646f6e277420706c6179";
             Assert.AreEqual(answer, output);
-        }
-
-        
-        
-        
-        
+        }        
         
         //Set 1, Challenge 5
         [TestMethod]

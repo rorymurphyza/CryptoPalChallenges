@@ -9,13 +9,13 @@ namespace CryptoPalChallenges
     public static class Extensions
     {
         /// <summary>
-        /// Extension method to convert ASCII-encoded byte array into string
+        /// Extension method to convert Unicode-encoded byte array into string
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public static string toString(this byte[] input)
         {
-            return System.Text.Encoding.Unicode.GetString(input);
+            return System.Text.Encoding.ASCII.GetString(input);
         }
 
         /// <summary>
@@ -32,9 +32,54 @@ namespace CryptoPalChallenges
             return byteArray;
         }
 
+        /// <summary>
+        /// Extension method to convert byte[] into Base64-encoded string
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string toBase64String(this byte[] input)
         {
             return System.Convert.ToBase64String(input);
+        }
+
+        /// <summary>
+        /// Extension method to convert Base64 string to byte[]
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte[] base64ToByteArray(this string input)
+        {
+            return Convert.FromBase64String(input);
+        }
+
+        /// <summary>
+        /// Extension method to convert given Unicode string into equivalent byte array.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte[] toByteArray(this string input)
+        {
+            byte[] output = new byte[input.Length];
+            for (int i = 0; i < output.Length; i++)
+            {
+                char c = input.Substring(i, 1)[0];
+                output[i] = Convert.ToByte(c);
+            }
+
+            return output;
+        }
+
+        /// <summary>
+        /// Extension method to convert byte[] into hex-encoded output string.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string toHexString(this byte[] input)
+        {
+            StringBuilder hex = new StringBuilder();
+            foreach (byte b in input)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
         }
     }    
 }

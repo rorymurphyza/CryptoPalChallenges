@@ -79,4 +79,26 @@ namespace Cipher
             }
         }
     }
+
+    /// <summary>
+    /// Thrown when IV is not the correct length.
+    /// </summary>
+    public class InvalidLengthIV : Exception
+    {
+        public InvalidLengthIV()
+        {
+
+        }
+        public InvalidLengthIV(string message) : base(message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "Invalid Length for IV, must be the same as blockSize";
+            }
+        }
+    }
 }

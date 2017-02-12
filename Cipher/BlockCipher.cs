@@ -39,6 +39,7 @@ namespace Cipher
         private int _blockSize;
         /// <summary>
         /// The BlockSize for the the key. Should be the same size as the key. Default is 16 bytes (128-bit).
+        /// Set in bytes.
         /// </summary>
         public int blockSize
         {
@@ -52,6 +53,25 @@ namespace Cipher
                     this._blockSize = value;
                 else
                     throw new InvalidBlockSizeException(string.Format("Invalid block size, must be multiple of 8, size is {0}", blockSize));
+            }
+        }
+
+        private byte[] _IV;
+        /// <summary>
+        /// The initial vector for CBC Mode. Must be same length as blockSize
+        /// </summary>
+        public byte[] IV
+        {
+            get
+            {
+                return this._IV;
+            }
+            set
+            {
+                if (value.Length == blockSize)
+                    this._IV = value;
+                else
+                    throw new InvalidLengthIV();
             }
         }
 
@@ -71,9 +91,17 @@ namespace Cipher
         /// </summary>
         /// <param name="_input"></param>
         /// <returns></returns>
-        public string PCKS7Padding(string _input)
+        public string PCKS7Padding(string input)
         {
             //Work for Set 2, Challenge 9
+            int paddingBytes = this.blockSize - (input.Length % this.blockSize);
+
+            if (paddingBytes == 0)   //already the correct blockSize
+                return input.PadRight(input.Length + this.blockSize, (char)this.blockSize);
+
+            return input.PadRight(input.Length + paddingBytes, (char)paddingBytes);
+            /*
+
             int paddingLength = 0;
             if (_input.Length == blockSize)
                 return _input.PadRight((_input.Length + 1), (char)(-_input.Length));
@@ -84,7 +112,13 @@ namespace Cipher
                 inputToBePadded = inputToBePadded.Substring(blockSize, (inputToBePadded.Length - blockSize));
             }
             paddingLength = blockSize - inputToBePadded.Length;
-            return inputToBePadded.PadRight(blockSize, (char)paddingLength);
+            return _input.PadRight(blockSize, (char)paddingLength);*/
+        }
+
+        public byte[] PCKS7Padding(byte[] input)
+        {
+            string inputString = input.toString();
+            return this.PCKS7Padding(inputString).toByteArray();
         }
 
         /// <summary>
@@ -126,6 +160,15 @@ namespace Cipher
             for (int i = 0; i < output.Length; i++)
                 output[i] = this.plainText[i];
 
+            this.plainText = output;
+        }
+
+        private void removePCKSPadding()
+        {
+            byte paddingLength = this.plainText[this.plainText.Length - 1];
+            byte[] output = new byte[this.plainText.Length - paddingLength];
+            for (int i = 0; i < output.Length; i++)
+                output[i] = this.plainText[i];
             this.plainText = output;
         }
 
@@ -186,16 +229,67 @@ namespace Cipher
 
         public class CBCMode : BlockCipher
         {
-            public byte[] IV { get; set; }
+            /// <summary>
+            /// Default constructor, uses blockSize of 16 bytes (128-bit), IV of 0x00s
+            /// </summary>
+            public CBCMode()
+            {
+                this.blockSize = 16;
+                byte[] iv = new byte[this.blockSize];
+                for (int i = 0; i < iv.Length; i++)
+                    iv[0] = 0x00;
+                this.IV = iv;
+            }
 
             public override void encrypt()
             {
-                
+                //check for padding and add if we need
+                byte[] plain = this.plainText;
+                if ((plain.Length % this.blockSize) != 0)
+                    plain = this.PCKS7Padding(plain);
+
+                //break the plainText into blockSize blocks to work with
+                List<byte[]> plainBlocks = plain.toList(this.blockSize);
+
+                //do the CBC encryption algorithm
+                List<byte[]> cipherBlocks = new List<byte[]>();
+                byte[] iv = this.IV;    //we are going to modify this, so extract it from the object
+                BlockCipher ecb = new BlockCipher.ECBMode();    //CBC uses ECB as the basis for encryption
+                ecb.key = this.key;
+                foreach (byte[] plainBlock in plainBlocks)
+                {
+                    byte[] XORedBlock = Utilities.XORByteArrays(plainBlock, iv);                    
+                    ecb.plainText = XORedBlock;
+                    ecb.encrypt();
+                    cipherBlocks.Add(ecb.cipherText);
+                    iv = ecb.cipherText;    //update iv as the seed for the next block
+                }
+
+                this.cipherText = cipherBlocks.toByteArray();
             }
 
             public override void decrypt()
             {
-                
+                //get the cipherText blocks
+                List<byte[]> cipherBlocks = this.cipherText.toList(this.blockSize);
+
+                //do the CBC decryption algorithm
+                List<byte[]> plainBlocks = new List<byte[]>();
+                byte[] iv = this.IV;
+                BlockCipher ecb = new BlockCipher.ECBMode();
+                ecb.key = this.key;
+                foreach (byte[] cipherBlock in cipherBlocks)
+                {
+                    ecb.cipherText = cipherBlock;
+                    ecb.decrypt();
+                    byte[] decypheredBlock = ecb.plainText;
+                    byte[] plainBlock = Utilities.XORByteArrays(decypheredBlock, iv);
+                    plainBlocks.Add(plainBlock);
+                    iv = cipherBlock;
+                }
+
+                this.plainText = plainBlocks.toByteArray();
+                this.removePCKSPadding();
             }
         }
     }

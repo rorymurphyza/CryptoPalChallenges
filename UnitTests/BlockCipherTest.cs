@@ -112,10 +112,24 @@ namespace UnitTests
             answer = "YELLOW SUBMAR\u0003\u0003\u0003";
             Assert.AreEqual(answer, output);
             Assert.AreEqual(cipher.blockSize, output.Length);
+
+            cipher = new BlockCipher.ECBMode();
+            input = "YELLOW SUBMARINES ARE YELLOW";
+            output = cipher.PCKS7Padding(input);
+            answer = "YELLOW SUBMARINES ARE YELLOW\u0004\u0004\u0004\u0004";
+            Assert.AreEqual(answer, output);
+            Assert.AreEqual(0, output.Length % cipher.blockSize);
+
+            cipher = new BlockCipher.ECBMode();
+            input = "YELLOW SUBMARINE";
+            output = cipher.PCKS7Padding(input);
+            answer = "YELLOW SUBMARINE\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010\u0010";
+            Assert.AreEqual(answer, output);
+            Assert.AreEqual(0, output.Length % cipher.blockSize);
         }
 
         [TestMethod]
-        public void ECBEncryption()
+        public void ECBEncryptionTest()
         {
             BlockCipher cipher = new BlockCipher.ECBMode();
             cipher.key = "YELLOW SUBMARINE".toByteArray();
@@ -130,7 +144,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void ECBDecryption()
+        public void ECBDecryptionTest()
         {
             BlockCipher cipher = new BlockCipher.ECBMode();
             cipher.key = "YELLOW SUBMARINE".toByteArray();
@@ -141,6 +155,116 @@ namespace UnitTests
             string answer = "ABCDE";
 
             Assert.AreEqual(answer, cipher.plainText.toString());
+        }
+
+        [TestMethod]
+        public void BlockCipherIVTest()
+        {
+            BlockCipher cipher = new BlockCipher.CBCMode();
+            //check for case of valid IV
+            byte[] iv = new byte[cipher.blockSize];
+            for (int i = 0; i < iv.Length; i++)
+                iv[i] = 0x00;
+            cipher.IV = iv;
+            Assert.AreEqual(cipher.blockSize, cipher.IV.Length);
+            int ivSum = 0;
+            foreach (byte b in cipher.IV)
+                ivSum += b;
+            Assert.AreEqual(0, ivSum);
+            
+            //check for short IV size
+            string ivString = "YELLOW";            
+            try
+            {
+                cipher.IV = ivString.toByteArray();
+                Assert.Fail("IV size is incorrect at set");
+            }
+            catch (InvalidLengthIV e)
+            {
+                Assert.IsNotNull(e.Message);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [TestMethod]
+        public void CBCModeDefaultConstructorTest()
+        {
+            BlockCipher cipher = new BlockCipher.CBCMode();
+            Assert.AreEqual(16, cipher.blockSize);
+            Assert.AreEqual(16, cipher.IV.Length);
+
+            int ivSum = 0;
+            for (int i = 0; i < cipher.IV.Length; i++)
+                ivSum += cipher.IV[i];
+            Assert.AreEqual(0, ivSum);
+        }
+
+        [TestMethod]
+        public void CBCEncryptionTest()
+        {
+            string input = "ABCDEABCDEABCDEF";
+            string key = "YELLOW SUBMARINE";
+
+            BlockCipher cipher = new BlockCipher.CBCMode();
+            cipher.blockSize = key.Length;
+            cipher.key = key.toByteArray();
+            byte[] iv = new byte[key.Length];
+            for (int i = 0; i < iv.Length; i++)
+                iv[i] = 0x00;
+            cipher.IV = iv;
+            cipher.plainText = input.toByteArray();
+            cipher.encrypt();
+
+            string answer = "aad74425bfd3f8ff22772f75be746df8";
+            Assert.AreEqual(answer, cipher.cipherText.toHexString());
+
+            answer = "qtdEJb/T+P8idy91vnRt+A==";
+            Assert.AreEqual(answer, Convert.ToBase64String(cipher.cipherText));
+        }
+
+        [TestMethod]
+        public void CBCDecryptionTest()
+        {
+            string input = "qtdEJb/T+P8idy91vnRt+A==";
+            string key = "YELLOW SUBMARINE";
+
+            BlockCipher cipher = new BlockCipher.CBCMode();
+            cipher.key = key.toByteArray();
+            cipher.blockSize = key.Length;
+            cipher.cipherText = Convert.FromBase64String(input);
+            byte[] iv = new byte[cipher.blockSize];
+            for (int i = 0; i < cipher.blockSize; i++)
+                iv[i] = 0x00;
+            cipher.IV = iv;
+            cipher.decrypt();
+
+            string answer = "ABCDEABCDEABCDEF";
+            Assert.AreEqual(answer, cipher.plainText.toString());
+        }
+
+        [TestMethod]
+        public void CBCEncryptionAndDecryption()
+        {
+            string plain = "This is the original message.";
+            string key = "BLUISH SUBMARINE";
+
+            //encrypt
+            BlockCipher cipher = new BlockCipher.CBCMode();
+            cipher.plainText = plain.toByteArray();
+            cipher.key = key.toByteArray();
+            cipher.encrypt();
+            string base64Message = cipher.cipherText.toBase64String();
+
+            //decrypt
+            cipher = new BlockCipher.CBCMode();
+            cipher.cipherText = base64Message.base64ToByteArray();
+            cipher.key = key.toByteArray();
+            cipher.decrypt();
+
+            Assert.AreEqual(plain, cipher.plainText.toString());
         }
     }
 }

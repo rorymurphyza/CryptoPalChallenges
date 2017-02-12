@@ -1,6 +1,7 @@
 ﻿using System;
 using CryptoPalChallenges;
 using CryptoPalChallenges.Set1;
+using CryptoPalChallenges.Set2;
 using CryptoPalChallenges.Set3;
 using Cipher;
 
@@ -18,6 +19,7 @@ namespace Shell
             //Workers.DetectECBEncoding();      //Set 1, Challenge 8 worker and solution, deprecated
             //Set1.doChallenge8();              //Set 1, Challenge 8 worker and solution
 
+            Set2.doChallenge10();
 
             Console.WriteLine();
             Console.WriteLine("All done. Press any key to exit.");

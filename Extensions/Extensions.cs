@@ -15,6 +15,28 @@ namespace Extensions
         /// <returns></returns>
         public static string toString(this byte[] input)
         {
+            if (input[input.Length - 1] == 0x00)
+            {
+                byte bytesDropped = 0;
+                for (int i = input.Length - 1; i > 0; i--)
+                {
+                    if (input[i] == 0x00)
+                        bytesDropped++;
+                }
+                byte[] output = new byte[input.Length - bytesDropped];
+                for (int i = 0; i < output.Length; i++)
+                    output[i] = input[i];
+                return System.Text.Encoding.ASCII.GetString(output);
+            }
+            else if (input[input.Length - 1] < 0x0F)
+            {
+                byte bytesDropped = input[input.Length - 1];
+                byte[] output = new byte[input.Length - bytesDropped];
+                for (int i = 0; i < output.Length; i++)
+                    output[i] = input[i];
+                return System.Text.Encoding.ASCII.GetString(output);
+            }
+
             return System.Text.Encoding.ASCII.GetString(input);
         }
 

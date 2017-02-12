@@ -223,7 +223,6 @@ namespace Cipher
                 };
 
                 this.plainText = aes.CreateDecryptor(aes.Key, aes.IV).TransformFinalBlock(this.cipherText, 0, this.cipherText.Length);
-                this.removePadding();
             }
         }
 
@@ -289,7 +288,7 @@ namespace Cipher
                 }
 
                 this.plainText = plainBlocks.toByteArray();
-                this.removePCKSPadding();
+                //this.removePCKSPadding();
             }
         }
     }

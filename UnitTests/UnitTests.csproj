@@ -67,6 +67,10 @@
       <Project>{07229564-c582-4d3a-b07f-767693d1c33e}</Project>
       <Name>CryptoPalChallenges</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Extensions\Extensions.csproj">
+      <Project>{39cde86f-73d0-4a5c-af5b-11858baf904a}</Project>
+      <Name>Extensions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

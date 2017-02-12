@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CryptoPalChallenges;
+using Extensions;
 
 namespace Cipher
 {
@@ -73,6 +73,7 @@ namespace Cipher
         /// <returns></returns>
         public string PCKS7Padding(string _input)
         {
+            //Work for Set 2, Challenge 9
             int paddingLength = 0;
             if (_input.Length == blockSize)
                 return _input.PadRight((_input.Length + 1), (char)(-_input.Length));
@@ -87,17 +88,29 @@ namespace Cipher
         }
 
         /// <summary>
-        /// Pad the given byte[] to blockSize, returns the padded byte[]
+        /// Checks if the given cipherText is in ECB Mode
         /// </summary>
-        /// <param name="_input"></param>
         /// <returns></returns>
-        public byte[] PCKS7Padding(byte[] _input)
+        public bool isECBMode()
         {
-            string input = Utils.ConvertByteArrayToString(_input);
-            int unpaddedLength = input.Length / blockSize;
-            int paddingLength = input.Length % blockSize;
-            input = input.PadRight((unpaddedLength + 1) * blockSize, (char)(16 - paddingLength));
-            return Utils.ConvertStringToByteArray(input);
+            bool isECB = false;
+            List<byte[]> cipherBlocks = cipherText.toList(16); //turn cipherText in List of byte[], where each byte[] represents one ECB block
+            List<byte[]> uniqueBlocks = new List<byte[]>();  //The list to be populated with each unique block
+            foreach (byte[] block in cipherBlocks)
+            {
+                bool found = false;
+                foreach (byte[] compare in uniqueBlocks)
+                {
+                    if (Enumerable.SequenceEqual(block, compare))
+                        found = true;   //We found this block in uniqueBlocks, so we have found a duplicate
+                }
+                if (!found)
+                    uniqueBlocks.Add(block); //We haven't got this block already, so it is a new unique block
+            }
+
+            if (cipherBlocks.Count != uniqueBlocks.Count)
+                return true;
+            return isECB;
         }
 
         private void removePadding()

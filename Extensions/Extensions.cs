@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CryptoPalChallenges
+namespace Extensions
 {
     public static class Extensions
     {
@@ -81,5 +81,43 @@ namespace CryptoPalChallenges
                 hex.AppendFormat("{0:x2}", b);
             return hex.ToString();
         }
-    }    
+
+        /// <summary>
+        /// Extension method to convert byte[] into a List of block, given blockSize
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="blockSize"></param>
+        /// <returns></returns>
+        public static List<byte[]> toList(this byte[] input, int blockSize)
+        {
+            List<Byte[]> output = new List<byte[]>();
+            byte[] array = new byte[blockSize];
+
+            for (int i = 0; i < input.Length; i = i + blockSize)
+            {
+                array = input.Skip(i).Take(blockSize).ToArray();
+                output.Add(array);
+            }
+
+            return output;
+        }
+
+        /// <summary>
+        /// Extension method to turn List of byte[] back to byte[]
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte[] toByteArray(this List<byte[]> input)
+        {
+            byte[] output = new byte[input.Count * input[0].Length];
+            for (int i = 0; i < input.Count; i++)
+            {
+                for (int j = 0; j < input[0].Length; j++)
+                {
+                    output[(i * input[0].Length) + j] = input[i][j];
+                }
+            }
+            return output;
+        }
+    }
 }

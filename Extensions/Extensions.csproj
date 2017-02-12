@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9F1FDE29-53E5-4B84-8A11-CB8078AF6442}</ProjectGuid>
+    <ProjectGuid>{39CDE86F-73D0-4A5C-AF5B-11858BAF904A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cipher</RootNamespace>
-    <AssemblyName>Cipher</AssemblyName>
+    <RootNamespace>Extensions</RootNamespace>
+    <AssemblyName>Extensions</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,16 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlockCipher.cs" />
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="ICipher.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj">
-      <Project>{39cde86f-73d0-4a5c-af5b-11858baf904a}</Project>
-      <Name>Extensions</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

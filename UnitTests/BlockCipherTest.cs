@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Cipher;
-using CryptoPalChallenges;
+using Extensions;
 
 namespace UnitTests
 {

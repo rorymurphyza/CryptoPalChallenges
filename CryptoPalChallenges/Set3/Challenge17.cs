@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace CryptoPalChallenges.Set3
 {
     public partial class Set3
-    {
-        
+    {        
         public static void doChallenge17()
         {
             rnd = new Random();

@@ -21,7 +21,7 @@ namespace CryptoPalChallenges.Set2
             for (int i = 0; i < 10; i++)
             {
                 bool isECB;
-                cipherText = oracle(input, out isECB);
+                cipherText = oracle11(input, out isECB);
 
                 //now, check it using our BlockCipher object
                 BlockCipher cipher = new BlockCipher.ECBMode();
@@ -34,7 +34,7 @@ namespace CryptoPalChallenges.Set2
             }
         }
 
-        internal static  byte[] oracle(string input, out bool isECB)   //The out statement is to check that we are detecting correctly, proper oracle shouldn't have it
+        internal static byte[] oracle11(string input, out bool isECB)   //The out statement is to check that we are detecting correctly, proper oracle shouldn't have it
         {
             byte[] plainText = addRandomBytes(input.toByteArray());
 

@@ -23,7 +23,8 @@ namespace Shell
             //Set2.doChallenge11();
             //Set2.doChallenge12();
             //Set2.doChallenge13();
-            Set2.doChallenge14();
+            //Set2.doChallenge14();
+            //Challenge 15 added to BlockCipher, check unit tests for results
 
             Console.WriteLine();
             Console.WriteLine("All done. Press any key to exit.");

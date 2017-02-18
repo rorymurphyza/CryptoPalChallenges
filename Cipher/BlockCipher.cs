@@ -212,6 +212,51 @@ namespace Cipher
         }
 
         /// <summary>
+        /// Check if input has valid PKCS#7 padding in it. 
+        /// Throws InvalidPadding Exception if not, returns stripped input if it is valid
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="valid"></param>
+        /// <returns></returns>
+        public byte[] isValidPadding(out bool valid)
+        {
+            valid = false;
+            byte[] output = new byte[0];
+
+            //first, let's make sure our length is correct. We know it should be a minimum of 16 byte (128-bit)
+            if (this.plainText.Length % 16 != 0)
+                throw new InvalidPaddingException("Incorrect message length");
+
+            //now, we have an indication of the block size, so we should be able to look at the last byte and see how many bytes of padding we might have here
+            byte paddingLength = this.plainText[this.plainText.Length - 1];
+            //we want to make sure all padding bytes are the same
+            byte[] paddingBytes = this.plainText.Skip(this.plainText.Length - paddingLength).Take(paddingLength).ToArray();
+            for (int i = 0; i < paddingBytes.Length; i++)
+            {
+                if (paddingBytes[i] != paddingLength)
+                    throw new InvalidPaddingException(string.Format("Padding bytes are not the same {0} compared to {1}", paddingBytes[i], paddingLength));
+            }
+
+            //check if we have the correct amount of bytes as the padding number indicats
+            int bytesCounted = 0;
+            for (int i = this.plainText.Length - 1; i >= 0; i--)
+            {
+                if (bytesCounted == paddingLength)
+                    break;
+                if (this.plainText[i] == paddingLength)
+                    bytesCounted++;
+                else
+                    throw new InvalidPaddingException(string.Format("Padding bytes count and actual are different {0} indicates {1} actual", paddingLength, bytesCounted));
+            }
+
+
+            //we can simply extract only the part of the byte array that is not padded and return this
+
+            valid = true;
+            return this.plainText.Skip(0).Take(this.plainText.Length - paddingLength).ToArray();
+        }
+
+        /// <summary>
         /// Electronic Code Book implementation. Default constructor sets blockSize of 16 bytes (128-bit)
         /// </summary>
         public class ECBMode : BlockCipher

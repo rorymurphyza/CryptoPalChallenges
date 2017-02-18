@@ -275,5 +275,109 @@ namespace UnitTests
             int answer = cipher.blockSize;
             Assert.AreEqual(answer, output);
         }
+
+        [TestMethod]
+        public void ValidatePCKS7PaddingECBTest()
+        {
+            BlockCipher cipher = new BlockCipher.ECBMode();
+            string plainText = "ICE ICE BABY\x04\x04\x04\x04";
+            cipher.plainText = plainText.toByteArray();
+            bool isValid = false;
+            byte[] plainTextOut = cipher.isValidPadding(out isValid);
+            Assert.AreEqual("ICE ICE BABY", plainTextOut.toString());
+            Assert.IsTrue(isValid);
+
+            cipher = new BlockCipher.ECBMode();
+            plainText = "ICE ICE BABY\x05\x05\x05\x05";
+            cipher.plainText = plainText.toByteArray();
+            isValid = false;
+            try
+            {
+                cipher.isValidPadding(out isValid);
+                Assert.Fail();
+            }
+            catch (InvalidPaddingException e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.IsFalse(isValid);
+            }
+            catch (Exception e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.Fail();
+            }
+
+            cipher = new BlockCipher.ECBMode();
+            plainText = "ICE ICE BABY\x01\x02\x03\x04";
+            cipher.plainText = plainText.toByteArray();
+            isValid = false;
+            try
+            {
+                cipher.isValidPadding(out isValid);
+                Assert.Fail();
+            }
+            catch (InvalidPaddingException e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.IsFalse(isValid);
+            }
+            catch (Exception e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        public void ValidatePCKS7PaddingCBCTest()
+        {
+            BlockCipher cipher = new BlockCipher.CBCMode();
+            string plainText = "ICE ICE BABY\x04\x04\x04\x04";
+            cipher.plainText = plainText.toByteArray();
+            bool isValid = false;
+            byte[] plainTextOut = cipher.isValidPadding(out isValid);
+            Assert.AreEqual("ICE ICE BABY", plainTextOut.toString());
+            Assert.IsTrue(isValid);
+
+            cipher = new BlockCipher.CBCMode();
+            plainText = "ICE ICE BABY\x05\x05\x05\x05";
+            cipher.plainText = plainText.toByteArray();
+            isValid = false;
+            try
+            {
+                cipher.isValidPadding(out isValid);
+                Assert.Fail();
+            }
+            catch (InvalidPaddingException e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.IsFalse(isValid);
+            }
+            catch (Exception e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.Fail();
+            }
+
+            cipher = new BlockCipher.CBCMode();
+            plainText = "ICE ICE BABY\x01\x02\x03\x04";
+            cipher.plainText = plainText.toByteArray();
+            isValid = false;
+            try
+            {
+                cipher.isValidPadding(out isValid);
+                Assert.Fail();
+            }
+            catch (InvalidPaddingException e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.IsFalse(isValid);
+            }
+            catch (Exception e)
+            {
+                Assert.IsNotNull(e.Message);
+                Assert.Fail();
+            }
+        }
     }
 }

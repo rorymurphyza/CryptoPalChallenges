@@ -101,4 +101,23 @@ namespace Cipher
             }
         }
     }
+
+    public class InvalidPaddingException : Exception
+    {
+        public InvalidPaddingException()
+        {
+
+        }
+        public InvalidPaddingException(string message) : base (message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "PCKS#7 Padding is not valid for this cipherText";
+            }
+        }
+    }
 }

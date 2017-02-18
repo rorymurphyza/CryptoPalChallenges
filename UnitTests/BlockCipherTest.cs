@@ -266,5 +266,14 @@ namespace UnitTests
 
             Assert.AreEqual(plain, cipher.plainText.toString());
         }
+
+        [TestMethod]
+        public void FindBlockSizeTest()
+        {
+            BlockCipher cipher = new BlockCipher.ECBMode();
+            int output = cipher.findBlockSize();
+            int answer = cipher.blockSize;
+            Assert.AreEqual(answer, output);
+        }
     }
 }

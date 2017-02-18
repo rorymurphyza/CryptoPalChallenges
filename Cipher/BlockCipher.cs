@@ -147,6 +147,45 @@ namespace Cipher
             return isECB;
         }
 
+        /// <summary>
+        /// Calculates the blocksize of the BlockCipher object
+        /// </summary>
+        /// <returns></returns>
+        public int findBlockSize()
+        {
+            int suspectedBlockSize = 0;
+            int confirmedBlockSize = 0;
+            bool foundSuspect = false;
+
+            //Let's call the oracle with an ever-increasing string until the ciphertext gets longer. 
+            StringBuilder sb = new StringBuilder("A");
+            for (int i = 1; i < (256 / 8); i++)
+            {
+                int currentPlainLength = sb.ToString().Length;
+                BlockCipher ecb = new BlockCipher.ECBMode();
+                ecb.plainText = sb.ToString().toByteArray();
+                byte[] ecbKey = new byte[this.blockSize];
+                for (byte j = 0; j < ecbKey.Length; j++)
+                    ecbKey[j] = j;
+                ecb.blockSize = this.blockSize;
+                ecb.key = ecbKey;
+                ecb.encrypt();
+                int currentCipherLength = ecb.cipherText.Length;
+                if (!(foundSuspect) && (currentCipherLength > suspectedBlockSize))
+                {
+                    suspectedBlockSize = currentCipherLength;
+                    foundSuspect = true;
+                }
+                if (foundSuspect && (currentCipherLength > suspectedBlockSize))
+                {
+                    confirmedBlockSize = currentCipherLength;
+                    break;
+                }
+                sb.Append("A");
+            }
+            return confirmedBlockSize - suspectedBlockSize;
+        }
+
         private void removePadding()
         {
             int paddingCount = 0;

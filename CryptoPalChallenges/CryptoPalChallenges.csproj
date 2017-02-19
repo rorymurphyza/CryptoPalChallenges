@@ -57,6 +57,7 @@
     <Compile Include="Set2\Challenge12.cs" />
     <Compile Include="Set2\Challenge13.cs" />
     <Compile Include="Set2\Challenge14.cs" />
+    <Compile Include="Set2\Challenge16.cs" />
     <Compile Include="Set2\Set2.cs" />
     <Compile Include="Set3\Challenge17.cs" />
     <Compile Include="Set3\Set3.cs" />

@@ -25,8 +25,14 @@ namespace CryptoPalChallenges.Set3
             bool validPadding = false;
             byte[] plainText = challenge17Decrypter(cipherText, IV, out validPadding);           
             Console.WriteLine("Padding is {0}", validPadding ? "valid" : "invalid");
-        }    
-        
+
+            #region attack it
+            //let's assume we don't have the decrypter here. Knowing that we have valid padding, can we attack this and decrypt the cipherText?
+
+
+            #endregion
+        }
+
         private static byte[] challenge17Oracle(out byte[] IV)
         {
             //select a random string from the selection
@@ -42,7 +48,7 @@ namespace CryptoPalChallenges.Set3
             BlockCipher cipher = new BlockCipher.CBCMode();
             cipher.plainText = plainText;
             cipher.key = ChallengeKey;
-            cipher.padding = System.Security.Cryptography.PaddingMode.Zeros;
+            cipher.padding = System.Security.Cryptography.PaddingMode.PKCS7;
             cipher.encrypt();
             IV = cipher.IV;
             return cipher.cipherText;

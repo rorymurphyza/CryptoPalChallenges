@@ -76,6 +76,11 @@ namespace Cipher
         }
 
         /// <summary>
+        /// Padding to be used. 
+        /// </summary>
+        public System.Security.Cryptography.PaddingMode padding { get; set; } = System.Security.Cryptography.PaddingMode.Zeros;
+        
+        /// <summary>
         /// Encrpyt the set plainText using the set key. Will write cipherText property, which can be getted.
         /// </summary>
         /// <returns></returns>
@@ -100,19 +105,6 @@ namespace Cipher
                 return input.PadRight(input.Length + this.blockSize, (char)this.blockSize);
 
             return input.PadRight(input.Length + paddingBytes, (char)paddingBytes);
-            /*
-
-            int paddingLength = 0;
-            if (_input.Length == blockSize)
-                return _input.PadRight((_input.Length + 1), (char)(-_input.Length));
-
-            string inputToBePadded = _input;
-            while (inputToBePadded.Length > blockSize)   //If the string is longer than the length, we only want to pad the last block
-            {
-                inputToBePadded = inputToBePadded.Substring(blockSize, (inputToBePadded.Length - blockSize));
-            }
-            paddingLength = blockSize - inputToBePadded.Length;
-            return _input.PadRight(blockSize, (char)paddingLength);*/
         }
 
         public byte[] PCKS7Padding(byte[] input)
@@ -282,7 +274,7 @@ namespace Cipher
                     Key = this.key,
                     BlockSize = this.blockSize * 8,
                     Mode = System.Security.Cryptography.CipherMode.ECB,
-                    Padding = System.Security.Cryptography.PaddingMode.Zeros,
+                    Padding = this.padding,
                     IV = iv
                 };
 
@@ -302,7 +294,7 @@ namespace Cipher
                     Key = this.key,
                     BlockSize = this.blockSize * 8,
                     Mode = System.Security.Cryptography.CipherMode.ECB,
-                    Padding = System.Security.Cryptography.PaddingMode.Zeros,
+                    Padding = this.padding,
                     IV = iv
                 };
 
@@ -372,7 +364,6 @@ namespace Cipher
                 }
 
                 this.plainText = plainBlocks.toByteArray();
-                //this.removePCKSPadding();
             }
         }
     }

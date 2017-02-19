@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cipher;
+using Extensions;
 
 namespace CryptoPalChallenges.Set3
 {
@@ -13,18 +15,15 @@ namespace CryptoPalChallenges.Set3
         {
             rnd = new Random();
             //generate the key
-            ChallengeKey = BlockCipherdep.generateRandomAESKey();
+            GenerateAESChallengeKey();
 
             //Call the oracle and get back the cipherText and IV
             byte[] IV;
             byte[] cipherText = challenge17Oracle(out IV);
 
             //now we have the cipher text and IV, let's decrypt it and see what we get back
-            byte[] plainText = challenge17Decrypter(cipherText, IV);
-            //check padding is valid and remove it
-            bool validPadding;
-            plainText = Utils.isValidPadding(plainText, out validPadding);
-
+            bool validPadding = false;
+            byte[] plainText = challenge17Decrypter(cipherText, IV, out validPadding);           
             Console.WriteLine("Padding is {0}", validPadding ? "valid" : "invalid");
         }    
         
@@ -40,20 +39,23 @@ namespace CryptoPalChallenges.Set3
             byte[] plainText = inputCipherText[rnd.Next(0, inputCipherText.Count)];
 
             //Encrypt it under the CBC mode
-            var cipher = new BlockCipherdep(ChallengeKey);
+            BlockCipher cipher = new BlockCipher.CBCMode();
             cipher.plainText = plainText;
-            BlockCipherdep.CBCMode.encrypt(cipher);
-
+            cipher.key = ChallengeKey;
+            cipher.padding = System.Security.Cryptography.PaddingMode.Zeros;
+            cipher.encrypt();
             IV = cipher.IV;
             return cipher.cipherText;
         }
 
-        private static byte[] challenge17Decrypter(byte[] cipherText, byte[] IV)
+        private static byte[] challenge17Decrypter(byte[] cipherText, byte[] IV, out bool validPadding)
         {
-            var cipher = new BlockCipherdep(ChallengeKey);
+            var cipher = new BlockCipher.CBCMode();
             cipher.cipherText = cipherText;
             cipher.IV = IV;
-            BlockCipherdep.CBCMode.decrypt(cipher);
+            cipher.key = ChallengeKey;
+            cipher.decrypt();
+            cipher.plainText = cipher.isValidPadding(out validPadding);
 
             return cipher.plainText;
         }

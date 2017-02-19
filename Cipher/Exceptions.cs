@@ -102,6 +102,9 @@ namespace Cipher
         }
     }
 
+    /// <summary>
+    /// Thrown when padding is not valid for cipherText
+    /// </summary>
     public class InvalidPaddingException : Exception
     {
         public InvalidPaddingException()
@@ -117,6 +120,28 @@ namespace Cipher
             get
             {
                 return "PCKS#7 Padding is not valid for this cipherText";
+            }
+        }
+    }
+
+    /// <summary>
+    /// Thrown when nonce length is incorrect. Nonce length should be half of blockSize
+    /// </summary>
+    public class InvalidLengthNonce : Exception
+    {
+        public InvalidLengthNonce()
+        {
+
+        }
+        public InvalidLengthNonce(string message) : base(message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "Invalid length nonce, is should be half of blockSize";
             }
         }
     }

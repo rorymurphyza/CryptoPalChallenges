@@ -70,6 +70,13 @@ namespace Cipher
             {
                 if (value.Length == blockSize)
                     this._IV = value;
+                else if (this.GetType() == typeof(CTRMode))
+                {
+                    if (value.Length == blockSize / 2)
+                        this._IV = value;
+                    else
+                        throw new InvalidLengthNonce();
+                }                        
                 else
                     throw new InvalidLengthIV();
             }
@@ -364,6 +371,78 @@ namespace Cipher
                 }
 
                 this.plainText = plainBlocks.toByteArray();
+            }
+        }
+
+        public class CTRMode : BlockCipher
+        {
+            /// <summary>
+            /// Default constructor, uses blockSize of 16 bytes (128-bit), IV (nonce) of 0 and counter of zero. Nonce and counter are little-endian
+            /// </summary>
+            public CTRMode()
+            {
+                this.blockSize = 16;
+                byte[] nonce = new byte[this.blockSize / 2];
+                for (int i = 0; i < nonce.Length; i++)
+                    nonce[0] = 0x00;
+                //nonce goes in top half of IV array
+                byte[] counter = new byte[nonce.Length];
+                for (int i = 0; i < counter.Length; i++)
+                    counter[i] = 0x00;
+                //counter goes in bottom half of nonce
+                updateNonce(nonce, counter);                
+            }
+
+            public override void encrypt()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void decrypt()
+            {
+                
+            }
+
+            private void incrementCounter()
+            {
+                //seperate IV into nonce and counter
+                byte[] nonce = new byte[this.IV.Length / 2];
+                byte[] counter = new byte[this.IV.Length / 2];
+
+                //copy IV into each appropriate array
+                for (int i = 0; i < this.IV.Length; i++)
+                {
+                    if (i < nonce.Length)
+                        nonce[i] = this.IV[i];
+                    else
+                        counter[i - (blockSize / 2)] = this.IV[i];
+                }
+
+                //increment counter
+                for (int i = 0; i < counter.Length; i++)
+                {
+                    if (counter[i] < byte.MaxValue)
+                    {
+                        counter[i]++;
+                        break;
+                    }
+                }
+
+                //reassemble IV from nonce and counter
+                this.updateNonce(nonce, counter);
+            }
+
+            private void updateNonce(byte[] nonce, byte[] counter)
+            {
+                byte[] IV = new byte[nonce.Length + counter.Length];
+                for (int i = 0; i < IV.Length; i++)
+                {
+                    if (i < nonce.Length)
+                        IV[i] = nonce[i];
+                    else
+                        IV[i] = counter[i - (blockSize / 2)];
+                }
+                this.IV = IV;
             }
         }
     }

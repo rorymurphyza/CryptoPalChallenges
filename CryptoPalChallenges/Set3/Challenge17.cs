@@ -23,14 +23,8 @@ namespace CryptoPalChallenges.Set3
 
             //now we have the cipher text and IV, let's decrypt it and see what we get back
             bool validPadding = false;
-            byte[] plainText = challenge17Decrypter(cipherText, IV, out validPadding);           
+            byte[] plainText = challenge17Decrypter(cipherText, IV, out validPadding);
             Console.WriteLine("Padding is {0}", validPadding ? "valid" : "invalid");
-
-            #region attack it
-            //let's assume we don't have the decrypter here. Knowing that we have valid padding, can we attack this and decrypt the cipherText?
-
-
-            #endregion
         }
 
         private static byte[] challenge17Oracle(out byte[] IV)

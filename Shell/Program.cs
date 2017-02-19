@@ -4,6 +4,7 @@ using CryptoPalChallenges.Set1;
 using CryptoPalChallenges.Set2;
 using CryptoPalChallenges.Set3;
 using Cipher;
+using Extensions;
 
 namespace Shell
 {
@@ -27,7 +28,13 @@ namespace Shell
             //Challenge 15 added to BlockCipher, check unit tests for results
             //Set2.doChallenge16();
 
-            Set3.doChallenge17();
+            //Set3.doChallenge17();
+
+            string input64 = "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==";
+            BlockCipher cipher = new BlockCipher.CTRMode();
+            cipher.cipherText = input64.base64ToByteArray();
+            cipher.key = "YELLOW SUBMARINE".toByteArray();
+            cipher.decrypt();
 
             Console.WriteLine();
             Console.WriteLine("All done. Press any key to exit.");

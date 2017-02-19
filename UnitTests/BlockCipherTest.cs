@@ -379,5 +379,23 @@ namespace UnitTests
                 Assert.Fail();
             }
         }
+
+        [TestMethod]
+        public void CTREncryptionTest()
+        {
+
+        }
+
+        [TestMethod]
+        public void CTRDecryptionTest()
+        {
+            string input64 = "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==";
+            BlockCipher cipher = new BlockCipher.CTRMode();
+            cipher.cipherText = input64.base64ToByteArray();
+            cipher.key = "YELLOW SUBMARINE".toByteArray();
+            cipher.decrypt();
+
+            
+        }
     }
 }

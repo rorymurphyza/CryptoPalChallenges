@@ -131,12 +131,17 @@ namespace Extensions
         /// <returns></returns>
         public static byte[] toByteArray(this List<byte[]> input)
         {
-            byte[] output = new byte[input.Count * input[0].Length];
-            for (int i = 0; i < input.Count; i++)
+            int totalLength = 0;
+            foreach (byte[] block in input)
+                totalLength += block.Length;
+
+            byte[] output = new byte[totalLength];
+            int firstBlockLength = input[0].Length;
+            for (int block = 0; block < input.Count; block++)
             {
-                for (int j = 0; j < input[0].Length; j++)
+                for (int b = 0; b < input[block].Length; b++)
                 {
-                    output[(i * input[0].Length) + j] = input[i][j];
+                    output[block * firstBlockLength + b] = input[block][b];
                 }
             }
             return output;

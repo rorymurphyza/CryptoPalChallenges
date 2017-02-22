@@ -25,7 +25,7 @@ namespace Cipher
                     this._key = value;
                 else
                     throw new IncorrectKeySizeException(string.Format("Key is {0}, BlockSize is {1}", _key.Length, blockSize));
-            } 
+            }
         }
         /// <summary>
         /// The CipherText component. Can be set and used to generate the plaintext or get when plaintext has been encrypted.
@@ -70,13 +70,6 @@ namespace Cipher
             {
                 if (value.Length == blockSize)
                     this._IV = value;
-                else if (this.GetType() == typeof(CTRMode))
-                {
-                    if (value.Length == blockSize / 2)
-                        this._IV = value;
-                    else
-                        throw new InvalidLengthNonce();
-                }                        
                 else
                     throw new InvalidLengthIV();
             }
@@ -86,7 +79,7 @@ namespace Cipher
         /// Padding to be used. 
         /// </summary>
         public System.Security.Cryptography.PaddingMode padding { get; set; } = System.Security.Cryptography.PaddingMode.Zeros;
-        
+
         /// <summary>
         /// Encrpyt the set plainText using the set key. Will write cipherText property, which can be getted.
         /// </summary>
@@ -259,7 +252,7 @@ namespace Cipher
         /// Electronic Code Book implementation. Default constructor sets blockSize of 16 bytes (128-bit)
         /// </summary>
         public class ECBMode : BlockCipher
-        {   
+        {
             /// <summary>
             /// Default constructor, uses blockSize of 16 bytes (128-bit)
             /// </summary>
@@ -267,7 +260,7 @@ namespace Cipher
             {
                 blockSize = 16;
             }
-                     
+
             public override void encrypt()
             {
                 if (this.plainText == null)
@@ -340,7 +333,7 @@ namespace Cipher
                 ecb.key = this.key;
                 foreach (byte[] plainBlock in plainBlocks)
                 {
-                    byte[] XORedBlock = Utilities.XORByteArrays(plainBlock, iv);                    
+                    byte[] XORedBlock = Utilities.XORByteArrays(plainBlock, iv);
                     ecb.plainText = XORedBlock;
                     ecb.encrypt();
                     cipherBlocks.Add(ecb.cipherText);
@@ -373,77 +366,130 @@ namespace Cipher
                 this.plainText = plainBlocks.toByteArray();
             }
         }
-
-        public class CTRMode : BlockCipher
+    }
+    public class CTRMode : BlockCipher
+    {
+        private byte[] _nonce;
+        /// <summary>
+        /// The nonce value for the cipher mode. Is (blockSize / 2) in length, little endian.
+        /// </summary>
+        public virtual byte[] nonce
         {
-            /// <summary>
-            /// Default constructor, uses blockSize of 16 bytes (128-bit), IV (nonce) of 0 and counter of zero. Nonce and counter are little-endian
-            /// </summary>
-            public CTRMode()
+            get
             {
-                this.blockSize = 16;
-                byte[] nonce = new byte[this.blockSize / 2];
+                if (this._nonce == null)
+                    throw new NonceNotSetException();
+                return this._nonce;
+            }
+            set
+            {
+                if (this.GetType() != typeof(CTRMode))
+                    throw new NonceNotValid();
+                if (value.Length == blockSize / 2)
+                    this._nonce = value;
+                else
+                    throw new NonceInvalidLength();
+            }
+        }
+
+        private byte[] _streamCounter;
+        /// <summary>
+        /// The counter value for stream ciphers. Is (blockSize / 2) in length, little endian.
+        /// </summary>
+        public virtual byte[] streamCounter
+        {
+            get
+            {
+                if (this._streamCounter == null)
+                    throw new CounterNotSetException();
+                return this._streamCounter;
+            }
+            set
+            {
+                if (value.Length == blockSize / 2)
+                    this._streamCounter = value;
+                else
+                    throw new CounterInvalidLengthException();
+            }
+        }
+
+        /// <summary>
+        /// Default constructor, uses blockSize of 16 bytes (128-bit), nonce of 0 and counter of zero. Nonce and counter are little-endian
+        /// </summary>
+        public CTRMode()
+        {
+            this.blockSize = 16;
+            byte[] nonce = new byte[this.blockSize / 2];
+            for (int i = 0; i < nonce.Length; i++)
+                nonce[0] = 0x00;
+            this.nonce = nonce;
+            //nonce goes in top half of IV array
+            byte[] counter = new byte[nonce.Length];
+            for (int i = 0; i < counter.Length; i++)
+                counter[i] = 0x00;
+            this.streamCounter = counter;    
+        }
+
+        public override void encrypt()
+        {
+            byte[] inputPlainText = this.plainText;
+            this.cipherText = this.plainText;
+            this.decrypt();
+            this.cipherText = this.plainText;
+            this.plainText = inputPlainText;
+        }
+
+        public override void decrypt()
+        {
+            //break the ciphertext into blocks
+            var cipherTextBlocks = this.cipherText.toList(this.blockSize);
+            var plainTextBlocks = new List<byte[]>();
+
+            BlockCipher ecb = new BlockCipher.ECBMode();
+            ecb.key = this.key;
+            foreach (byte[] block in cipherTextBlocks)
+            {
+                //take nonce and combine with counter to create seed
+                byte[] seed = new byte[this.blockSize];
                 for (int i = 0; i < nonce.Length; i++)
-                    nonce[0] = 0x00;
-                //nonce goes in top half of IV array
-                byte[] counter = new byte[nonce.Length];
-                for (int i = 0; i < counter.Length; i++)
-                    counter[i] = 0x00;
-                //counter goes in bottom half of nonce
-                updateNonce(nonce, counter);                
+                    seed[i] = this.nonce[i];
+                for (int i = nonce.Length; i < seed.Length; i++)
+                    seed[i] = this.streamCounter[i - (blockSize / 2)];
+                //encrypt seed using ECB
+                ecb.plainText = seed;
+                ecb.encrypt();
+                seed = ecb.cipherText;
+
+                //XOR ciphered seed and cipherText
+                seed = Utilities.XORByteArrays(seed, block);
+
+                //plaintext is the result
+                plainTextBlocks.Add(seed);
+
+                this.incrementCounter();
             }
+            this.plainText = plainTextBlocks.toByteArray();
+            resetCounter();
+        }
 
-            public override void encrypt()
+        private void incrementCounter()
+        {
+            //increment counter
+            for (int i = 0; i < this.streamCounter.Length; i++)
             {
-                throw new NotImplementedException();
-            }
-
-            public override void decrypt()
-            {
-                
-            }
-
-            private void incrementCounter()
-            {
-                //seperate IV into nonce and counter
-                byte[] nonce = new byte[this.IV.Length / 2];
-                byte[] counter = new byte[this.IV.Length / 2];
-
-                //copy IV into each appropriate array
-                for (int i = 0; i < this.IV.Length; i++)
+                if (this.streamCounter[i] < byte.MaxValue)
                 {
-                    if (i < nonce.Length)
-                        nonce[i] = this.IV[i];
-                    else
-                        counter[i - (blockSize / 2)] = this.IV[i];
+                    this.streamCounter[i]++;
+                    break;
                 }
-
-                //increment counter
-                for (int i = 0; i < counter.Length; i++)
-                {
-                    if (counter[i] < byte.MaxValue)
-                    {
-                        counter[i]++;
-                        break;
-                    }
-                }
-
-                //reassemble IV from nonce and counter
-                this.updateNonce(nonce, counter);
             }
+        }
 
-            private void updateNonce(byte[] nonce, byte[] counter)
-            {
-                byte[] IV = new byte[nonce.Length + counter.Length];
-                for (int i = 0; i < IV.Length; i++)
-                {
-                    if (i < nonce.Length)
-                        IV[i] = nonce[i];
-                    else
-                        IV[i] = counter[i - (blockSize / 2)];
-                }
-                this.IV = IV;
-            }
+        private void resetCounter()
+        {
+            this.streamCounter = new byte[this.streamCounter.Length];
+            for (int i = 0; i < this.streamCounter.Length; i++)
+                this.streamCounter[i] = 0x00;
         }
     }
 }

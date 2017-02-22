@@ -145,4 +145,99 @@ namespace Cipher
             }
         }
     }
+
+    public class NonceNotValid : Exception
+    {
+        public NonceNotValid()
+        {
+
+        }
+        public NonceNotValid(string message) : base(message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "Nonce not valid for this type of cipher";
+            }
+        }
+    }
+
+    public class NonceInvalidLength : Exception
+    {
+        public NonceInvalidLength()
+        {
+
+        }
+        public NonceInvalidLength(string message) : base(message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "Invalid length nonce, should be (blockSize / 2)";
+            }
+        }
+    }
+
+    public class NonceNotSetException : Exception
+    {
+        public NonceNotSetException()
+        {
+
+        }
+        public NonceNotSetException(string message) : base(message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "Nonce not set.";
+            }
+        }
+    }
+
+    public class CounterNotSetException : Exception
+    {
+        public CounterNotSetException()
+        {
+
+        }
+        public CounterNotSetException(string message) : base(message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "Counter not set.";
+            }
+        }
+    }
+
+    public class CounterInvalidLengthException : Exception
+    {
+        public CounterInvalidLengthException()
+        {
+
+        }
+        public CounterInvalidLengthException(string message) : base(message)
+        {
+
+        }
+        public override string Message
+        {
+            get
+            {
+                return "Invalid length counter, should be (blockSize / 2)";
+            }
+        }
+    }
 }

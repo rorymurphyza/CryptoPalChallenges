@@ -31,10 +31,13 @@ namespace Shell
             //Set3.doChallenge17();
 
             string input64 = "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==";
-            BlockCipher cipher = new BlockCipher.CTRMode();
+            CTRMode cipher = new CTRMode();
             cipher.cipherText = input64.base64ToByteArray();
             cipher.key = "YELLOW SUBMARINE".toByteArray();
             cipher.decrypt();
+            string output = cipher.plainText.toString();
+            Console.WriteLine(cipher.plainText.toString());
+            
 
             Console.WriteLine();
             Console.WriteLine("All done. Press any key to exit.");

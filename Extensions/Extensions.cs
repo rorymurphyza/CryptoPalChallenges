@@ -41,6 +41,16 @@ namespace Extensions
         }
 
         /// <summary>
+        /// Extension method to turn a single byte into it's ASCII representation
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string toString(this byte input)
+        {
+            return System.Text.Encoding.ASCII.GetString(new byte[] { input });
+        }
+
+        /// <summary>
         /// Extension method to turn a string of hex bytes into a byte array for easy processing
         /// </summary>
         /// <param name="input"></param>
@@ -89,6 +99,17 @@ namespace Extensions
             }
 
             return output;
+        }
+
+        /// <summary>
+        /// Convert a single byte-length string to its actual byte value
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte toByte(this string input)
+        {
+            byte[] output = input.toByteArray();
+            return output[0];
         }
 
         /// <summary>

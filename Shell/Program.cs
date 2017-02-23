@@ -29,15 +29,8 @@ namespace Shell
             //Set2.doChallenge16();
 
             //Set3.doChallenge17();
-
-            string input64 = "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==";
-            CTRMode cipher = new CTRMode();
-            cipher.cipherText = input64.base64ToByteArray();
-            cipher.key = "YELLOW SUBMARINE".toByteArray();
-            cipher.decrypt();
-            string output = cipher.plainText.toString();
-            Console.WriteLine(cipher.plainText.toString());
-            
+            //Challenge 18 added to BlockCipher class as CTRMode. Check unit tests for results.
+            Set3.doChallenge19();
 
             Console.WriteLine();
             Console.WriteLine("All done. Press any key to exit.");

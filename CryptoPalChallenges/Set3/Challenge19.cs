@@ -62,7 +62,35 @@ namespace CryptoPalChallenges.Set3
                 }
             }
 
-            //TODO: implement SQL DB so we can access the scores easily
+            //now that we have the DataTable, let's group it and find the top result for each byte
+            int maxBytePosition = 0;
+            foreach (DataRow row in scoring.Rows)   //find max bytePosition in column
+                maxBytePosition = Math.Max(maxBytePosition, row.Field<int>("BytePosition"));
+            byte[] keystream = new byte[maxBytePosition];
+            for (int i = 0; i < maxBytePosition; i++)
+            {
+                DataTable filteredTable = (new DataView(scoring, string.Format("BytePosition={0}", i), "", DataViewRowState.CurrentRows)).ToTable();
+                //find the maximum score for the ByteValue, this ByteValue will be saves to our keystream
+                int maxScore = 0;
+                foreach (DataRow row in filteredTable.Rows)
+                {
+                    if (row.Field<int>("CumScore") > maxScore)
+                    {
+                        maxScore = row.Field<int>("CumScore");
+                        keystream[i] = row.Field<byte>("ByteValue");
+                    }
+                }
+            }
+
+            //now we have the keystream that the plaintext was XORed against to get the ciphertext. let's take just the first block of the keystream and see if we can recover the first block of the plaintext
+            byte[] keystreamBlock = new byte[16];
+            keystreamBlock = keystream.Take(16).ToArray();
+            for (int i = 0; i < cipherTextList.Count; i++)
+            {
+                var cipherTextBlock = cipherTextList[i].Take(16).ToArray();
+                var plainTextBlock = Utilities.XORByteArrays(keystreamBlock, cipherTextBlock);
+                Console.WriteLine(lineList[i].toString() + "        " + plainTextBlock.toString());
+            }
         }
 
         private static int ScoreString(string _input)

@@ -30,7 +30,10 @@ namespace Shell
 
             //Set3.doChallenge17();
             //Challenge 18 added to BlockCipher class as CTRMode. Check unit tests for results.
-            Set3.doChallenge19();
+            //Set3.doChallenge19();
+            //Challenge 20 inadvertantly solved when doing Challenge 19. See the code there
+            //Challenge 21 added to RandomNumber class. No unit tests done
+
 
             Console.WriteLine();
             Console.WriteLine("All done. Press any key to exit.");

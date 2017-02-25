@@ -33,7 +33,7 @@ namespace Shell
             //Set3.doChallenge19();
             //Challenge 20 inadvertantly solved when doing Challenge 19. See the code there
             //Challenge 21 added to RandomNumber class. No unit tests done
-
+            Set3.doChallenge22();
 
             Console.WriteLine();
             Console.WriteLine("All done. Press any key to exit.");

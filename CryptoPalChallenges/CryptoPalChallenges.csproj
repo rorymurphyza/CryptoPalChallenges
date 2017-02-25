@@ -62,6 +62,7 @@
     <Compile Include="Set2\Set2.cs" />
     <Compile Include="Set3\Challenge17.cs" />
     <Compile Include="Set3\Challenge19.cs" />
+    <Compile Include="Set3\Challenge22.cs" />
     <Compile Include="Set3\Set3.cs" />
   </ItemGroup>
   <ItemGroup>

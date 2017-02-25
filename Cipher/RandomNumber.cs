@@ -106,9 +106,10 @@ namespace Cipher
                 uint y = MT[i];
                 index = i + 1;
 
+                //this is the tempering function
                 y ^= (MT[i] >> u);
                 y ^= (y << s) & b;
-                y ^= (y >> t) & c;
+                y ^= (y << t) & c;
                 y ^= (y >> l);
 
                 return y;
